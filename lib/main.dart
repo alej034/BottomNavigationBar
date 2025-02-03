@@ -1,114 +1,86 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/home.dart';
+import 'package:provider/provider.dart';
 
-void main() => runApp(MyApp());
+//ChangeNotifierProvider: Envuelve la aplicación y proporciona el estado a los widgets.
+void main() {
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => CounterProvider(),
+      child: MyApp(),
+    ),
+  );
+}
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: LoginScreen(),
+      home: Counter(),
     );
   }
 }
+//CounterProvider: Clase que gestiona el estado del contador y notifica cambios.
+class CounterProvider extends ChangeNotifier {
+  int _counter = 0;
 
-class LoginScreen extends StatefulWidget {
-  @override
-  _LoginScreenState createState() => _LoginScreenState();
-}
+  int get counter => _counter;
 
-class _LoginScreenState extends State<LoginScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-
-  void _login() {
-    if (_formKey.currentState!.validate()) {
-      final email = _emailController.text;
-      final password = _passwordController.text;
-
-      // Aquí puedes manejar el inicio de sesión, por ejemplo, enviando los datos a un servidor.
-      print("Email: $email, Password: $password");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Login exitoso!")),
-      );
-    
-    }
+  void increment() {
+    _counter++;
+    notifyListeners();
   }
 
+  void decrement() {
+    if (_counter > 0) {
+      _counter--;
+      notifyListeners();
+    }
+  }
+  void reset() {
+    _counter = 0;
+    notifyListeners();
+  }
+}
+class Counter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "Bienvenido",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 20),
-              TextFormField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                  labelText: "Correo electrónico",
-                  border: OutlineInputBorder(),
+      appBar: AppBar(title: Text('Ejemplo de  Gestion de estado Provider')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Contador:', style: TextStyle(fontSize: 20)),
+            Consumer<CounterProvider>(
+              builder: (context, counterProvider, child) {
+                return Text(
+                  '${counterProvider.counter}',
+                  style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+                );
+              },
+            ),
+            SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FloatingActionButton(
+                  onPressed: () => context.read<CounterProvider>().decrement(),
+                  child: Icon(Icons.remove),
                 ),
-                keyboardType: TextInputType.emailAddress,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Por favor, ingresa tu correo";
-                  }
-                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                    return "Por favor, ingresa un correo válido";
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 20),
-              TextFormField(
-                controller: _passwordController,
-                decoration: InputDecoration(
-                  labelText: "Contraseña",
-                  border: OutlineInputBorder(),
+                SizedBox(width: 20),
+                FloatingActionButton(
+                  onPressed: () => context.read<CounterProvider>().increment(),
+                  child: Icon(Icons.add),
                 ),
-                obscureText: true,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Por favor, ingresa tu contraseña";
-                  }
-                  if (value.length < 6) {
-                    return "La contraseña debe tener al menos 6 caracteres";
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 30),
-              ElevatedButton(
-                
-                onPressed: ()=> {Navigator.push(context,MaterialPageRoute(builder:  (context)=> Home())  )},
-                child: Text("Iniciar sesión"),
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                ),
-              ),
-              SizedBox(height: 20),
-              TextButton(
-                onPressed: () {
-                  print("Recuperar contraseña presionado");
-                },
-                child: Text("¿Olvidaste tu contraseña?"),
-              ),
-            ],
-          ),
+              ],
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => context.read<CounterProvider>().reset(),
+              child: Text("Restablecer"),
+            ),
+          ],
         ),
       ),
     );

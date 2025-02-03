@@ -4,11 +4,14 @@ import 'package:flutter_application_1/pages/inicio.dart';
 import 'package:flutter_application_1/pages/perfil.dart';
 
 class Home extends StatelessWidget {
+  const Home({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Página de Inicio',
+      
       home: HomeScreen(),
       
     );
@@ -16,6 +19,8 @@ class Home extends StatelessWidget {
 }
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
   
@@ -28,9 +33,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
 //creacion de la lista donde estan las toguinas usadas  
   List<Widget> paguina = [
-    page_home(),
-    page_search(),
-    page_perfil()
+     page_home(),
+    const page_search(),
+    const page_perfil()
   ];
 // accion al dar tap en el navigationbar
   void _onTabTapped(int index) {
@@ -52,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onTap: _onTabTapped,
 
         // implementacion del navigationbar
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: "Inicio",
